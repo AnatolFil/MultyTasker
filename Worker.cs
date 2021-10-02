@@ -62,13 +62,13 @@ namespace MultyTasker
             managedThreadId = Thread.CurrentThread.ManagedThreadId;
             Random RandTime = new Random(DateTime.Now.Millisecond);
             this.position = Position;
-            OutputHandler.Write(this);
+            OutputHandler.WriteProgressInfo(this);
             for (int i=0;i<AmoutOfWork; i++)
             {
                 Task.Delay(RandTime.Next(10, Difficulty)).Wait();
                 //Thread.Sleep(RandTime.Next(10, Difficulty));
                 progress++;
-                OutputHandler.Write(this);  
+                OutputHandler.WriteProgressInfo(this);  
             }
             stopwatch.Stop();
             return stopwatch.Elapsed.TotalSeconds;

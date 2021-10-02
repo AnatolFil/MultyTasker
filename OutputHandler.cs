@@ -12,7 +12,7 @@ namespace MultyTasker
         //Sycronization object
         public static Mutex mtx = new Mutex();
         
-        public static void Write(Worker worker)
+        public static void WriteProgressInfo(Worker worker)
         {
             Console.CursorVisible = false;
             // Получить мьютекс
