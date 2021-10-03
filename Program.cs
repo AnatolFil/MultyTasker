@@ -11,6 +11,10 @@ namespace MultyTasker
     {
         static void Main(string[] args)
         {
+            //Console.OutputEncoding = System.Text.Encoding.UTF7;
+            //string s = "\u258C";
+            //Console.WriteLine(s);
+            //Console.ReadKey();
             SuperVisor.CreateAndStartWorkers(16, 1000);
             Console.ReadLine();
         }
