@@ -8,10 +8,13 @@ using System.Threading.Tasks;
 
 namespace MultyTasker
 {
+    //Class which will simulate some work and contain some info about
+    //progress, tine ... et.c
     class Worker
     {
         //Amount of steps to do
         private int AmoutOfWork;
+
         //Current progress of task
         private int progress;
         public int Progress
@@ -21,6 +24,7 @@ namespace MultyTasker
                 return progress;
             }
         }
+
         private int managedThreadId;
         public int ManagedThreadId
         {
@@ -29,9 +33,12 @@ namespace MultyTasker
                 return managedThreadId;
             }
         }
+
         public int Position { get; set; }
+
         //How many time worker can sleep
         public int Difficulty { get; set; }
+
         //How many time worker has been doing work, it ll be set when
         //worker finish work
         private double totalTime;
@@ -42,6 +49,7 @@ namespace MultyTasker
                 return totalTime;
             }
         }
+
         //Show how fast work`s done work
         private int finishPosition;
         public int FinishPosition
@@ -65,35 +73,42 @@ namespace MultyTasker
         //After all work done it set totalTime and get his finish position in SuperVisor class
         public void Work()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            managedThreadId = Thread.CurrentThread.ManagedThreadId;
-            Random RandTime = new Random(DateTime.Now.Millisecond);
-            OutputHandler.WriteWorkerInfo(this);
-            for (int i = 0; i < AmoutOfWork; i++)
+            try
             {
-                try
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                managedThreadId = Thread.CurrentThread.ManagedThreadId;
+                Random RandTime = new Random(DateTime.Now.Millisecond);
+                OutputHandler.WriteWorkerInfo(this);
+                for (int i = 0; i < AmoutOfWork; i++)
                 {
-                    if (RandTime.Next(1, 100) > 95)//Randomly rise exception
+                    try
                     {
-                        throw new Exception("New Exception!");
+                        if (RandTime.Next(1, 100) > 95)//Randomly rise exception
+                        {
+                            throw new Exception("New Exception!");
+                        }
+                        Task.Delay(RandTime.Next(10, Difficulty)).Wait();//Delay on random time, it can be adjusted by param Difficulty
+                        progress++;
+                        OutputHandler.WriteWorkerProgress(this);//Write in console progress
                     }
-                    Task.Delay(RandTime.Next(10, Difficulty)).Wait();//Delay on random time, it can be adjusted by param Difficulty
-                    progress++;
-                    OutputHandler.WriteWorkerProgress(this);//Write in console progress
+                    catch (Exception e)
+                    {
+                        progress++;
+                        OutputHandler.WriteWorkerProgress(this, true);
+                    }
                 }
-                catch(Exception e)
-                {
-                    progress++;
-                    OutputHandler.WriteWorkerProgress(this, true);
-                }
+                stopwatch.Stop();
+                totalTime = stopwatch.Elapsed.TotalSeconds;
+                int FinPosition = 0;
+                SuperVisor.GetFinishPosition(ref FinPosition);
+                finishPosition = FinPosition;
+                OutputHandler.WriteFinPositionAndTime(this);//Write in console about worker finish position and spended time
             }
-            stopwatch.Stop();
-            totalTime = stopwatch.Elapsed.TotalSeconds;
-            int FinPosition = 0;
-            SuperVisor.GetFinishPosition(ref FinPosition);
-            finishPosition = FinPosition;
-            OutputHandler.WriteFinPositionAndTime(this);//Write in console about worker finish position and spended time
+            catch(Exception e)
+            {
+                OutputHandler.WriteUnhadledException(this, e.Message);
+            }
         }
     }
 }

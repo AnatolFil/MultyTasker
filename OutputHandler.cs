@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace MultyTasker
 {
+    //Write info in console, use synchronization object
+    //to order work with console
     class OutputHandler
     {
         //Sycronization object
@@ -16,6 +18,8 @@ namespace MultyTasker
             Console.Title = "MultyTasker";
             Console.SetWindowSize(Console.WindowWidth + 5, Console.WindowHeight);
         }
+
+        //Write information about worker position and ManagedThreadId in console
         public static void WriteWorkerInfo(Worker worker)
         {
             Console.CursorVisible = false;
@@ -28,6 +32,8 @@ namespace MultyTasker
             } 
         }
 
+        //Write progress in console, if there is exception it change ForegroundColor
+        //on red
         public static void WriteWorkerProgress(Worker worker, bool IsError = false)
         {
             Console.CursorVisible = false;
@@ -46,6 +52,7 @@ namespace MultyTasker
             }
         }
 
+        //Write finish position and spended time in console
         public static void WriteFinPositionAndTime(Worker worker)
         {
             Console.CursorVisible = false;
@@ -54,6 +61,18 @@ namespace MultyTasker
                 Console.SetCursorPosition(worker.Progress + 7 , worker.Position);
                 string FinishInfo = String.Format(" {0:d2} ({1:N7})", worker.FinishPosition, worker.TotalTime);
                 Console.WriteLine(FinishInfo);
+            }
+        }
+
+        //Write in console about unhandled error
+        public static void WriteUnhadledException(Worker worker, string Msg)
+        {
+            Console.CursorVisible = false;
+            lock (Locker)
+            {
+                Console.SetCursorPosition(Console.WindowWidth/2, worker.Position);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Unhandled Error!");//Would be perfect to write error info in log file
             }
         }
     }
