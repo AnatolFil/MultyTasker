@@ -11,7 +11,11 @@ namespace MultyTasker
     {
         //Sycronization object
         public static Object Locker = new Object();
-        
+        static OutputHandler()
+        {
+            Console.Title = "MultyTasker";
+            Console.SetWindowSize(Console.WindowWidth + 5, Console.WindowHeight);
+        }
         public static void WriteWorkerInfo(Worker worker)
         {
             Console.CursorVisible = false;
@@ -24,14 +28,19 @@ namespace MultyTasker
             } 
         }
 
-        public static void WriteWorkerProgress(Worker worker)
+        public static void WriteWorkerProgress(Worker worker, bool IsError = false)
         {
             Console.CursorVisible = false;
             lock (Locker)
             {
+                Console.SetCursorPosition(6 + worker.Progress, worker.Position);
+                if (IsError == false)
+                    Console.ForegroundColor = ConsoleColor.Green;
+                else
+                    Console.ForegroundColor = ConsoleColor.Red; 
+                Console.Write("\u2590");
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.SetCursorPosition(6+worker.Progress, worker.Position);
-                string ProgressInfo = String.Format("\u2597 {0:d2} ", worker.Progress);
+                string ProgressInfo = String.Format(" {0:d2} ", worker.Progress);
                 Console.Write(ProgressInfo);
                 //Console.WriteLine(WorkerInfo);
             }
@@ -42,8 +51,9 @@ namespace MultyTasker
             Console.CursorVisible = false;
             lock (Locker)
             {
-                Console.SetCursorPosition(0, worker.Position);
-                Console.WriteLine(worker.Position + " (" + worker.ManagedThreadId + ") " + worker.Progress + " " + worker.FinishPosition + " " + worker.TotalTime);
+                Console.SetCursorPosition(worker.Progress + 7 , worker.Position);
+                string FinishInfo = String.Format(" {0:d2} ({1:N7})", worker.FinishPosition, worker.TotalTime);
+                Console.WriteLine(FinishInfo);
             }
         }
     }
