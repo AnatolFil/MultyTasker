@@ -10,17 +10,26 @@ namespace MultyTasker
     class OutputHandler
     {
         //Sycronization object
-        public static Mutex mtx = new Mutex();
+        public static Object Locker = new Object();
         
         public static void WriteProgressInfo(Worker worker)
         {
             Console.CursorVisible = false;
-            // Получить мьютекс
-            mtx.WaitOne();
-            Console.SetCursorPosition(0, worker.Position);
-            Console.WriteLine(worker.Position + " (" + worker.ManagedThreadId + ") " + worker.Progress);
-            mtx.ReleaseMutex();
+            lock(Locker)
+            {
+                Console.SetCursorPosition(0, worker.Position);
+                Console.WriteLine(worker.Position + " (" + worker.ManagedThreadId + ") " + worker.Progress);
+            } 
         }
 
+        public static void WriteFinPositionAndTime(Worker worker)
+        {
+            Console.CursorVisible = false;
+            lock (Locker)
+            {
+                Console.SetCursorPosition(0, worker.Position);
+                Console.WriteLine(worker.Position + " (" + worker.ManagedThreadId + ") " + worker.Progress + " " + worker.FinishPosition + " " + worker.TotalTime);
+            }
+        }
     }
 }

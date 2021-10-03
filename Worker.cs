@@ -29,22 +29,25 @@ namespace MultyTasker
                 return managedThreadId;
             }
         }
-        private int position;
-        public int Position
+        public int Position { get; set; }
+        public int Difficulty { get; set; }
+        private double totalTime;
+        public double TotalTime
         {
             get
             {
-                return position;
+                return totalTime;
             }
         }
-        public int Difficulty { get; set; }
-
-        //Lock default constructor and leave only custom constructor
-        // to be sure in right initialization
-        private Worker()
+        private int finishPosition;
+        public int FinishPosition
         {
-
+            get
+            {
+                return finishPosition;
+            }
         }
+
         public Worker(int AmoutOfWork = 100, int Difficulty = 100)
         {
             this.AmoutOfWork = AmoutOfWork;
@@ -52,31 +55,26 @@ namespace MultyTasker
             progress = 0;
         }
 
-
-
         //Do some work. Increase Progress and sleep random time.
-        private double Work(int Position)
+        public void Work()
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             managedThreadId = Thread.CurrentThread.ManagedThreadId;
             Random RandTime = new Random(DateTime.Now.Millisecond);
-            this.position = Position;
             OutputHandler.WriteProgressInfo(this);
             for (int i=0;i<AmoutOfWork; i++)
             {
                 Task.Delay(RandTime.Next(10, Difficulty)).Wait();
-                //Thread.Sleep(RandTime.Next(10, Difficulty));
                 progress++;
                 OutputHandler.WriteProgressInfo(this);  
             }
             stopwatch.Stop();
-            return stopwatch.Elapsed.TotalSeconds;
-        }
-
-        public async void DoWorkAsync(int Position)
-        {            
-            await Task.Run(() => Work(Position));
+            totalTime = stopwatch.Elapsed.TotalSeconds;
+            int FinPosition = 0;
+            SuperVisor.GetFinishPosition(ref FinPosition);
+            finishPosition = FinPosition;
+            OutputHandler.WriteFinPositionAndTime(this);
         }
     }
 }
